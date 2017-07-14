@@ -11,6 +11,7 @@
 @interface WBSpringBoardCombinedCell : WBSpringBoardCell
 
 @property (nonatomic, readonly) UIView *directoryView;
+@property (nonatomic, readonly) UILabel *folderLabel;
 
 - (void)refreshSubImageNames:(NSArray<NSString *> *)imageNameArray;
 - (void)refreshSubImages:(NSArray<UIImage *> *)imageArray;
