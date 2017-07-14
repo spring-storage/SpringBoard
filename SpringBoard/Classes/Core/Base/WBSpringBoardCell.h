@@ -32,6 +32,9 @@
 @property (nonatomic, readonly) UIImageView *imageView;
 @property (nonatomic, readonly) UILabel *label;
 
+@property (strong, nonatomic) UIImageView *editImageView;
+@property (strong, nonatomic) UIImageView *checkImageView;
+
 @property (nonatomic, weak) id<WBSpringBoardCellDelegate> delegate;
 @property (nonatomic, weak) id<WBSpringBoardCellLongGestureDelegate> longGestureDelegate;
 @property (nonatomic, readonly) UILongPressGestureRecognizer *longGesture;

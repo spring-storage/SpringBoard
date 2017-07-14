@@ -101,7 +101,7 @@
 {
     if (_isEdit != isEdit) {
         _isEdit = isEdit;
-
+        
         if (isEdit) {
             _textField.text = _label.text;
         } else {
@@ -119,7 +119,7 @@
 - (void)setOriginTitle:(NSString *)originTitle
 {
     _originTitle = originTitle;
-
+    
     _textField.text = originTitle;
     _label.text = originTitle;
 }

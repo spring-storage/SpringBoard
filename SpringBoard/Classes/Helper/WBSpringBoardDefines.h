@@ -28,7 +28,12 @@
 
 #define kCellInnerRectSideSpace 15
 
-#define kCombinedCellShowItemColCount 3
-#define kCombinedCellShowItemRowCount 3
+#define kCombinedCellShowItemColCount 2
+#define kCombinedCellShowItemRowCount 2
+
+#define IDIOM    UI_USER_INTERFACE_IDIOM()
+#define screenWidth [[UIScreen mainScreen] bounds].size.width
+#define screenHeight [[UIScreen mainScreen] bounds].size.height
+#define IPAD     UIUserInterfaceIdiomPad
 
 #endif /* WBSpringBoardDefines_h */

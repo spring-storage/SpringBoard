@@ -35,7 +35,7 @@
     self.allowCombination = YES;
     self.allowOverlapCombination = NO;
     self.allowSingleItemCombinedCell = YES;
-
+    
     self.springBoardComponentDelegate = self;
     self.springBoardComponentDataSource = self;
     
@@ -50,10 +50,16 @@
 - (void)clickSpringBoardCell:(WBSpringBoardCell *)cell
 {
     if ([cell isKindOfClass:WBSpringBoardCombinedCell.class]) {
-        [self showCombinedCellsForCell:((WBSpringBoardCombinedCell *)cell)];
+        [self clickFolderCell:cell];
     } else {
         [super clickSpringBoardCell:cell];
     }
+}
+
+- (void)clickFolderCell:(WBSpringBoardCell *)cell {
+    @WBWeakObj(self);
+    NSInteger index = [self indexForCell:cell];
+    [_springBoardDelegate springBoardView:weakself clickFolderItemAtIndex:index cell:cell];
 }
 
 #pragma mark - Setter & Getter
@@ -72,21 +78,20 @@
     @WBWeakObj(self);
     NSInteger index = [self indexForCell:cell];
     
-    WBSpringBoardInnerView *innerView = [[WBSpringBoardInnerView alloc] init];
-    innerView.superIndex = index;
-    innerView.superCell = cell;
-    innerView.springBoardComponentDelegate = self;
-    innerView.springBoardComponentDataSource = self;
-    innerView.springBoardInnerViewOutsideGestureDelegate = self;
-    innerView.layout = _innerViewLayout;
-    innerView.hiddenOnePageIndicator = self.hiddenOnePageIndicator;
+    self.innerView = [[WBSpringBoardInnerView alloc] init];
+    self.innerView.superIndex = index;
+    self.innerView.superCell = cell;
+    self.innerView.springBoardComponentDelegate = self;
+    self.innerView.springBoardComponentDataSource = self;
+    self.innerView.springBoardInnerViewOutsideGestureDelegate = self;
+    self.innerView.layout = _innerViewLayout;
     
-    WBSpringBoardPopupView *popupView = [[WBSpringBoardPopupView alloc] init];
-    [popupView.contentView addSubview:innerView];
-    popupView.originTitle = cell.label.text;
-    popupView.isEdit = self.isEdit;
-    innerView.popupView = popupView;
-    popupView.maskClickBlock = ^(WBSpringBoardPopupView *popupView) {
+    self.popupView = [[WBSpringBoardPopupView alloc] init];
+    [self.popupView.contentView addSubview:self.innerView];
+    self.popupView.originTitle = cell.label.text;
+    self.popupView.isEdit = self.isEdit;
+    self.innerView.popupView = self.popupView;
+    self.popupView.maskClickBlock = ^(WBSpringBoardPopupView *popupView) {
         NSString *originTitle = popupView.originTitle;
         NSString *currentTitle = popupView.currentTitle;
         if ((currentTitle && currentTitle.length > 0) && ![originTitle isEqualToString:currentTitle]) {
@@ -97,19 +102,19 @@
         
         [popupView hideWithAnimated:YES removeFromSuperView:YES];
     };
-    [innerView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.mas_equalTo(innerView.superview);
+    [self.innerView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.mas_equalTo(self.innerView.superview);
     }];
-    [kAppKeyWindow addSubview:popupView];
+    [kAppKeyWindow addSubview:self.popupView];
     
-    popupView.alpha = 0.0;
+    self.popupView.alpha = 0.0;
     [UIView animateWithDuration:kAnimationDuration animations:^{
-        popupView.alpha = 1.0;
-        [popupView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.edges.mas_equalTo(popupView.superview);
+        self.popupView.alpha = 1.0;
+        [self.popupView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.edges.mas_equalTo(self.popupView.superview);
         }];
     } completion:^(BOOL finished) {
-        innerView.isEdit = weakself.isEdit;
+        self.innerView.isEdit = weakself.isEdit;
     }];
 }
 
@@ -163,11 +168,10 @@
         WBSpringBoardCell *cell = [[WBSpringBoardCell alloc] init];
         if (_springBoardDataSource && [_springBoardDataSource respondsToSelector:@selector(springBoardView:subCellForItemAtIndex:withSuperIndex:)]) {
             cell = [_springBoardDataSource springBoardView:weakself subCellForItemAtIndex:0 withSuperIndex:superIndex];
-            cell.isEdit = self.isEdit;
         }
         
         if (_springBoardDataSource && [_springBoardDataSource respondsToSelector:@selector(springBoardView:moveSubItemAtIndex:toSubIndex:withSuperIndex:)]) {
-            [_springBoardDataSource springBoardView:weakself moveSubItemAtIndex:0 toSuperIndex:superIndex withSuperIndex:superIndex];
+            [_springBoardDataSource springBoardView:weakself moveSubItemAtIndex:0 toSuperIndex:0 withSuperIndex:superIndex];
         }
         
         if (_springBoardDataSource && [_springBoardDataSource respondsToSelector:@selector(springBoardView:removeItemAtIndex:)]) {
@@ -191,17 +195,17 @@
 
 #pragma mark - WBSpringBoardComponentDelegate Method
 
-- (void)springBoardComponent:(WBSpringBoardComponent *)springBoardComponent clickItemAtIndex:(NSInteger)index
+- (void)springBoardComponent:(WBSpringBoardComponent *)springBoardComponent clickItemAtIndex:(NSInteger)index cell:(WBSpringBoardCell *)cell
 {
     @WBWeakObj(self);
     if ([springBoardComponent isKindOfClass:WBSpringBoardView.class]) {
-        if (_springBoardDelegate && [_springBoardDelegate respondsToSelector:@selector(springBoardView:clickItemAtIndex:)]) {
-            [_springBoardDelegate springBoardView:weakself clickItemAtIndex:index];
+        if (_springBoardDelegate && [_springBoardDelegate respondsToSelector:@selector(springBoardView:clickItemAtIndex:cell:)]) {
+            [_springBoardDelegate springBoardView:weakself clickItemAtIndex:index cell:cell];
         }
     } else if ([springBoardComponent isKindOfClass:WBSpringBoardInnerView.class]) {
-        if (_springBoardDelegate && [_springBoardDelegate respondsToSelector:@selector(springBoardView:clickSubItemAtIndex:withSuperIndex:)]) {
+        if (_springBoardDelegate && [_springBoardDelegate respondsToSelector:@selector(springBoardView:clickSubItemAtIndex:withSuperIndex:cell:)]) {
             NSInteger superIndex = ((WBSpringBoardInnerView *)springBoardComponent).superIndex;
-            [_springBoardDelegate springBoardView:weakself clickSubItemAtIndex:index withSuperIndex:superIndex];
+            [_springBoardDelegate springBoardView:weakself clickSubItemAtIndex:index withSuperIndex:superIndex cell:cell];
         }
     }
 }
@@ -302,15 +306,6 @@
 - (void)springBoardInnerView:(WBSpringBoardInnerView *)springBoardInnerView outsideGestureEnd:(UILongPressGestureRecognizer *)gesture fromCell:(WBSpringBoardCell *)cell
 {
     [super springBoardCell:cell longGestureStateEnd:gesture];
-    
-    // ----- 2017-04-28 modify begin -----
-    // fix drag out of combineCell then drag into this combineCell again, crash bug.
-    
-    // In this condition, method [super springBoardCell:longGestureStateEnd:] will replace original combineCell(springBoarderInnerView.superCell), then springBoarderInnerView.superCell no longer contained by self.contentCellArray
-    if (![self.contentCellArray containsObject:springBoardInnerView.superCell]) {
-        springBoardInnerView.superCell = [self.contentCellArray objectAtIndex:springBoardInnerView.superIndex];
-    }
-    // ----- 2017-04-28 modify end -----
     
     cell.delegate = self;
     cell.longGestureDelegate = self;

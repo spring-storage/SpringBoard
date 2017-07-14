@@ -7,6 +7,8 @@
 //
 
 #import "WBSpringBoardComponent.h"
+#import "WBSpringBoardInnerView.h"
+#import "WBSpringBoardPopupView.h"
 
 @class WBSpringBoardView;
 @class WBSpringBoardLayout;
@@ -38,9 +40,11 @@
 @protocol WBSpringBoardViewDelegate <NSObject>
 
 @optional
-- (void)springBoardView:(WBSpringBoardView *)springBoardView clickItemAtIndex:(NSInteger)index;
+- (void)springBoardView:(WBSpringBoardView *)springBoardView clickItemAtIndex:(NSInteger)index cell:(WBSpringBoardCell *)cell;
 
-- (void)springBoardView:(WBSpringBoardView *)springBoardView clickSubItemAtIndex:(NSInteger)index withSuperIndex:(NSInteger)superIndex;
+- (void)springBoardView:(WBSpringBoardView *)springBoardView clickSubItemAtIndex:(NSInteger)index withSuperIndex:(NSInteger)superIndex cell:(WBSpringBoardCell *)cell;
+
+- (void)springBoardView:(WBSpringBoardView *)springBoardView clickFolderItemAtIndex:(NSInteger)index cell:(WBSpringBoardCell *)cell;
 
 @end
 
@@ -52,5 +56,8 @@
 @property (nonatomic, strong) WBSpringBoardLayout *innerViewLayout;
 
 @property (nonatomic, assign) BOOL allowSingleItemCombinedCell; // default YES
+@property (strong, nonatomic) WBSpringBoardInnerView *innerView;
+
+@property (strong, nonatomic) WBSpringBoardPopupView *popupView;
 
 @end

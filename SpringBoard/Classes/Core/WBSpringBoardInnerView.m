@@ -72,7 +72,7 @@
         }
         
         [_popupView hideWithAnimated:NO removeFromSuperView:YES];
-    
+        
         self.isDragOutsideMode = NO;
     }
     

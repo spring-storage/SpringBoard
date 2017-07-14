@@ -29,7 +29,7 @@
 @protocol WBSpringBoardComponentDelegate <NSObject>
 
 @optional
-- (void)springBoardComponent:(WBSpringBoardComponent *)springBoardComponent clickItemAtIndex:(NSInteger)index;
+- (void)springBoardComponent:(WBSpringBoardComponent *)springBoardComponent clickItemAtIndex:(NSInteger)index cell:(WBSpringBoardCell *)cell;
 
 @end
 

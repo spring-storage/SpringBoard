@@ -15,6 +15,7 @@
 @interface WBSpringBoardCell ()
 
 @property (nonatomic, weak) UIView *directoryHolderView;
+@property (assign, nonatomic) CGSize testSize;
 
 @end
 
@@ -22,12 +23,15 @@
 
 #define kImageViewSize CGSizeMake(70, 70)
 #define kImageViewCornerRadius 10
-#define kLabelFontSize 12
+#define kLabelFontSize 17
 #define kLabelPaddingTop 2
 #define kLabelWidthOffset 10
 
 #define kViewScaleFactor 1.2
-
+#define IDIOM    UI_USER_INTERFACE_IDIOM()
+#define screenWidth [[UIScreen mainScreen] bounds].size.width
+#define screenHeight [[UIScreen mainScreen] bounds].size.height
+#define IPAD     UIUserInterfaceIdiomPad
 #pragma mark - Init & Dealloc
 
 - (instancetype)init
@@ -46,7 +50,8 @@
         _contentView = contentView;
         
         UIView *directoryHolderView = [[UIView alloc] initWithFrame:CGRectZero];
-        directoryHolderView.backgroundColor = [UIColor lightGrayColor];
+        
+        directoryHolderView.backgroundColor = [UIColor colorWithRed:59.f/255.f green:124.f/255.f blue:210.f/255.f alpha:1];
         directoryHolderView.layer.cornerRadius = kImageViewCornerRadius;
         directoryHolderView.userInteractionEnabled = NO;
         directoryHolderView.hidden = YES;
@@ -63,8 +68,29 @@
         
         UILabel *label = [[UILabel alloc] init];
         label.font = [UIFont systemFontOfSize:kLabelFontSize];
-        [contentView addSubview:label];
+        label.textColor = [UIColor colorWithRed:52.f/255.f green:52.f/255.f blue:52.f/255.f alpha:1.0];
+        [label setBackgroundColor:[UIColor colorWithRed:212.f/255.f green:212.f/255.f blue:212.f/255.f alpha:0.8f]];
+        label.textAlignment = NSTextAlignmentCenter;
+        label.numberOfLines = 0;
+        label.lineBreakMode = NSLineBreakByWordWrapping;
+        [label setFrame:CGRectMake(0, imageView.frame.size.height - 69.f, imageView.frame.size.width, 69.f)];
+        [imageView addSubview:label];
         _label = label;
+        
+        UIImageView *editImageView = [[UIImageView alloc] init];
+        editImageView.image = [UIImage imageNamed:@"list-black"];
+        editImageView.contentMode = UIViewContentModeScaleToFill;
+        editImageView.alpha = 0.4f;
+        editImageView.layer.cornerRadius = kImageViewCornerRadius;
+        editImageView.layer.masksToBounds = YES;
+        [contentView addSubview:editImageView];
+        _editImageView = editImageView;
+        
+        UIImageView *checkImageView = [[UIImageView alloc] init];
+        checkImageView.contentMode = UIViewContentModeScaleToFill;
+        checkImageView.alpha = 0.8f;
+        [contentView addSubview:checkImageView];
+        _checkImageView = checkImageView;
         
         [contentView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.center.mas_equalTo(self);
@@ -79,14 +105,48 @@
         [imageView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.centerX.mas_equalTo(contentView);
             make.top.mas_equalTo(contentView);
-            make.size.mas_equalTo(kImageViewSize);
+            CGSize size = CGSizeZero;
+            
+            if (IDIOM == IPAD) {
+                size.width = screenWidth/4-16;
+            } else {
+                size.width = screenWidth/2-16;
+            }
+            size.height = size.width*1.25;
+            self.testSize = size;
+            make.size.mas_equalTo(size);
         }];
-
+        
+        [editImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.mas_equalTo(contentView);
+            make.top.mas_equalTo(contentView);
+            CGSize size = CGSizeZero;
+            
+            if (IDIOM == IPAD) {
+                size.width = screenWidth/4-16;
+            } else {
+                size.width = screenWidth/2-16;
+            }
+            size.height = size.width*1.25;
+            self.testSize = size;
+            make.size.mas_equalTo(size);
+        }];
+        
         [label mas_makeConstraints:^(MASConstraintMaker *make) {
             make.centerX.mas_equalTo(self);
-            make.top.mas_equalTo(imageView.mas_bottom).offset(kLabelPaddingTop);
-            make.width.mas_lessThanOrEqualTo(imageView).offset(-1 * kLabelWidthOffset);
-            make.height.mas_equalTo(label.font.lineHeight);
+            make.top.mas_equalTo(imageView.mas_bottom).offset(-69);
+            //            make.width.mas_lessThanOrEqualTo(imageView).offset(-1 * kLabelWidthOffset);
+            make.width.mas_equalTo(self.testSize.width);
+            //            make.height.mas_equalTo(label.font.lineHeight);
+            make.height.mas_equalTo(69);
+        }];
+        
+        [checkImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.width.mas_equalTo(30);
+            make.height.mas_equalTo(30);
+            make.top.mas_equalTo(8);
+            make.right.mas_equalTo(-8);
+            
         }];
         
         // process set nil image problems
@@ -121,15 +181,15 @@
     _isEdit = isEdit;
     
     [self.layer removeAnimationForKey:@"rocking"];
-    if (isEdit) {
-        CAKeyframeAnimation *rockAnimation = [CAKeyframeAnimation animation];
-        rockAnimation.keyPath = @"transform.rotation";
-        rockAnimation.values = @[@(AngleToRadian(-3)),@(AngleToRadian(3)),@(AngleToRadian(-3))];
-        rockAnimation.repeatCount = MAXFLOAT;
-        rockAnimation.duration = kAnimationDuration;
-        rockAnimation.removedOnCompletion = NO;
-        [self.layer addAnimation:rockAnimation forKey:@"rocking"];
-    }
+    //    if (isEdit) {
+    //        CAKeyframeAnimation *rockAnimation = [CAKeyframeAnimation animation];
+    //        rockAnimation.keyPath = @"transform.rotation";
+    //        rockAnimation.values = @[@(AngleToRadian(-3)),@(AngleToRadian(3)),@(AngleToRadian(-3))];
+    //        rockAnimation.repeatCount = MAXFLOAT;
+    //        rockAnimation.duration = kAnimationDuration;
+    //        rockAnimation.removedOnCompletion = NO;
+    //        [self.layer addAnimation:rockAnimation forKey:@"rocking"];
+    //    }
 }
 
 - (void)setShowDirectoryHolderView:(BOOL)showDirectoryHolderView
